@@ -1,9 +1,11 @@
 package compiler
 
 import (
+	"fmt"
 	"monkey/ast"
 	"monkey/code"
 	"monkey/lexer"
+	"monkey/object"
 	"monkey/parser"
 	"testing"
 )
@@ -69,5 +71,41 @@ func parse(input string) *ast.Program {
 func testInstructions(expected []code.Instructions, actual code.Instructions) error {
 	concatted := concatInstructions(expected)
 
-	
+	if len(actual) != len(concatted) {
+		return fmt.Errorf("wrong instructions length. \nwant=%q\ngot=%q", &concatted, actual)
+	}
+
+	for i, ins := range concatted {
+		if actual[i] != ins {
+			return fmt.Errorf("wrong instruction at %d.\nwant=%q\ngot=%q", i, &concatted, actual)
+		}
+	}
+	return nil
+}
+
+func concatInstructions(s []code.Instructions) code.Instructions {
+	out := code.Instructions{}
+
+	for _, ins := range s {
+		out = append(out, ins...)
+	}
+
+	return out
+}
+
+func testConstatns (t *testing.T, expected []interface{}, actual []object.Object)error {
+	if len(expected)!=len(actual) {
+		return fmt.Errorf("wrong number of constatns.got=%d,want=%d", len(actual), len(expected))
+	}
+
+	for i, constant := range expected {
+		switch constant := constant.(type) {
+		case int:
+			err := testIntegerObject(int64(constant), actual[i])
+
+			if err != nil {
+				return fmt.Errorf("constant %d - testIntegerObject failed: %s", i, err)
+			}
+		}
+	}
 }
