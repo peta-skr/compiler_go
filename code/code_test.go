@@ -36,9 +36,9 @@ func TestInstructionsString(t *testing.T) {
 	}
 
 	expected := `0000 OpConstant 1
-	0003 OpConstant 2
-	0006 OpConstant 65535
-	`
+0003 OpConstant 2
+0006 OpConstant 65535
+`
 
 	concatted := Instructions{}
 
@@ -74,12 +74,12 @@ func TestReadOperands(t *testing.T) {
 		operandsRead, n := ReadOperands(def, instruction[1:])
 
 		if n != tt.bytesRead {
-			t.Fatalf("nwrong.want-%d,got=%d", tt.bytesRead, n)
+			t.Fatalf("wrong.want=%d,got=%d", tt.bytesRead, n)
 		}
 
 		for i,want := range tt.operands {
 			if operandsRead[i] != want {
-				t.Errorf("operand wrong.want=%d,got=%d",want, operandsRead[i])
+				t.Errorf("operand wrong. want=%d,got=%d",want, operandsRead[i])
 			}
 		}
 	}
