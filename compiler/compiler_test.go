@@ -11,33 +11,58 @@ import (
 )
 
 type compilerTestCase struct {
-	input string
-	expectedConstants []interface{}
+	input                string
+	expectedConstants    []interface{}
 	expectedInstructions []code.Instructions
 }
 
 func TestIntegerArithmetic(t *testing.T) {
-	tests := []compilerTestCase {
+	tests := []compilerTestCase{
 		{input: "1 + 2",
-		expectedConstants: []interface{}{1,2},
-		expectedInstructions:  []code.Instructions{
-			code.Make(code.OpConstant, 0),
-			code.Make(code.OpConstant, 1),
-			code.Make(code.OpAdd),
-			code.Make(code.OpPop),
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpPop),
+			},
 		},
-		
-	},
-	{input: "1;2",
-		expectedConstants: []interface{}{1,2},
-		expectedInstructions:  []code.Instructions{
-			code.Make(code.OpConstant, 0),
-			code.Make(code.OpPop),
-			code.Make(code.OpConstant, 1),
-			code.Make(code.OpPop),
+		{input: "1;2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpPop),
+			},
 		},
-	},
-
+		{input: "1 - 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSub),
+				code.Make(code.OpPop),
+			},
+		},
+		{input: "1 * 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpMul),
+				code.Make(code.OpPop),
+			},
+		},
+		{input: "2 / 1",
+			expectedConstants: []interface{}{2, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpDiv),
+				code.Make(code.OpPop),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
@@ -60,7 +85,7 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 		bytecode := compiler.Bytecode()
 		err = testInstructions(tt.expectedInstructions, bytecode.Instructions)
 
-		if err!=nil {
+		if err != nil {
 			t.Fatalf("testInstructions failed: %s", err)
 		}
 
@@ -105,8 +130,8 @@ func concatInstructions(s []code.Instructions) code.Instructions {
 	return out
 }
 
-func testConstatns (t *testing.T, expected []interface{}, actual []object.Object)error {
-	if len(expected)!=len(actual) {
+func testConstatns(t *testing.T, expected []interface{}, actual []object.Object) error {
+	if len(expected) != len(actual) {
 		return fmt.Errorf("wrong number of constatns.got=%d,want=%d", len(actual), len(expected))
 	}
 
