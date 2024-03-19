@@ -7,6 +7,7 @@ import (
 )
 
 type Opcode byte
+
 const (
 	OpConstant Opcode = iota
 	OpAdd
@@ -14,11 +15,11 @@ const (
 	OpSub
 	OpMul
 	OpDiv
+	OpTrue
+	OpFalse
 )
 
 type Instructions []byte
-
-
 
 type Definition struct {
 	Name          string
@@ -27,11 +28,13 @@ type Definition struct {
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
-	OpAdd: {"OpAdd", []int{}},
-	OpPop: {"OpPop", []int{}},
-	OpSub: {"OpSub", []int{}},
-	OpMul: {"OpMul", []int{}},
-	OpDiv: {"OpDiv", []int{}},
+	OpAdd:      {"OpAdd", []int{}},
+	OpPop:      {"OpPop", []int{}},
+	OpSub:      {"OpSub", []int{}},
+	OpMul:      {"OpMul", []int{}},
+	OpDiv:      {"OpDiv", []int{}},
+	OpTrue:     {"OpTrue", []int{}},
+	OpFalse:    {"OpFalse", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
@@ -44,7 +47,7 @@ func Lookup(op byte) (*Definition, error) {
 	return def, nil
 }
 
-func Make(op Opcode, operands ...int)[]byte {
+func Make(op Opcode, operands ...int) []byte {
 	def, ok := definitions[op]
 	if !ok {
 		return []byte{}
@@ -59,11 +62,11 @@ func Make(op Opcode, operands ...int)[]byte {
 	instruction := make([]byte, instructionLen)
 
 	instruction[0] = byte(op)
-	
+
 	offset := 1
-	
-	for i,o := range operands {
-		width := def.OperandWidths[i];
+
+	for i, o := range operands {
+		width := def.OperandWidths[i]
 		switch width {
 		case 2:
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
@@ -97,10 +100,10 @@ func (ins Instructions) String() string {
 	return out.String()
 }
 
-func ReadOperands(def *Definition, ins Instructions)([]int, int) {
+func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 	operands := make([]int, len(def.OperandWidths))
 
-	offset := 0;
+	offset := 0
 
 	for i, width := range def.OperandWidths {
 		switch width {
@@ -113,7 +116,7 @@ func ReadOperands(def *Definition, ins Instructions)([]int, int) {
 	return operands, offset
 }
 
-func ReadUnit16 (ins Instructions) uint16 {
+func ReadUnit16(ins Instructions) uint16 {
 	return binary.BigEndian.Uint16(ins)
 }
 

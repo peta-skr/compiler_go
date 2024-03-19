@@ -113,4 +113,5 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 	default:
 		return fmt.Errorf("unknown integer operator: %d", op)
 	}
+	return vm.push(&object.Integer{Value: result})
 }
