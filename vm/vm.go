@@ -87,6 +87,13 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.OpJump:
+			pos := int(code.ReadUnit16(vm.instructions[ip+1:]))
+			ip = pos - 1
+
+		case code.OpJumpNotTruthy:
+			pos := int
 		}
 	}
 
