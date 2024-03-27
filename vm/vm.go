@@ -102,6 +102,12 @@ func (vm *VM) Run() error {
 			if !isTruthy(condition) {
 				ip = pos - 1
 			}
+		case code.OpNull:
+			err := vm.push(Null)
+
+			if err != nil {
+				return err
+			}
 		}
 	}
 
