@@ -641,3 +641,22 @@ func TestCompilerScopes(t *testing.T) {
 		t.Errorf("previousInstruction.Opcode wrong. got=%d, want=%d", previous.Opcode, code.OpMul)
 	}
 }
+
+func TestFunctionsWithoutReturnValue(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `fn() { }`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpReturn),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
