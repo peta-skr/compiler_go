@@ -16,6 +16,8 @@ type VM struct {
 	stack        []object.Object
 	sp           int
 	globals      []object.Object
+	frames       []*Frame
+	framesIndex  int
 }
 
 var True = &object.Boolean{Value: true}
@@ -398,3 +400,10 @@ func (vm *VM) executeHashIndex(hash, index object.Object) error {
 
 	return vm.push(pair.Value)
 }
+
+func (vm *VM) currentFrame() *Frame {
+	return vm.frames[vm.framesIndex-1]
+}
+
+
+func (vm *VM)pushFrame
