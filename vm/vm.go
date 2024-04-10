@@ -9,6 +9,7 @@ import (
 
 const StackSize = 2048
 const GlobalSize = 65536
+const MaxFrames = 1024
 
 type VM struct {
 	constants    []object.Object
@@ -25,12 +26,19 @@ var False = &object.Boolean{Value: false}
 var Null = &object.Null{}
 
 func New(bytecode *compiler.Bytecode) *VM {
+	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	mainFrame := NewFrame(mainFn)
+
+	frames := make([]*Frame, MaxFrames)
+	frames[0] = mainFrame
+
 	return &VM{
-		instructions: bytecode.Instructions,
-		constants:    bytecode.Constants,
-		stack:        make([]object.Object, StackSize),
-		sp:           0,
-		globals:      make([]object.Object, GlobalSize),
+		constants:   bytecode.Constants,
+		stack:       make([]object.Object, StackSize),
+		sp:          0,
+		globals:     make([]object.Object, GlobalSize),
+		frames:      frames,
+		framesIndex: 1,
 	}
 }
 
@@ -405,5 +413,12 @@ func (vm *VM) currentFrame() *Frame {
 	return vm.frames[vm.framesIndex-1]
 }
 
+func (vm *VM) pushFrame(f *Frame) {
+	vm.frames[vm.framesIndex] = f
+	vm.framesIndex++
+}
 
-func (vm *VM)pushFrame
+func (vm *VM) popFrame() *Frame {
+	vm.framesIndex--
+	return vm.frames[vm.framesIndex]
+}
