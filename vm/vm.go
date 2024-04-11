@@ -12,13 +12,12 @@ const GlobalSize = 65536
 const MaxFrames = 1024
 
 type VM struct {
-	constants    []object.Object
-	instructions code.Instructions
-	stack        []object.Object
-	sp           int
-	globals      []object.Object
-	frames       []*Frame
-	framesIndex  int
+	constants   []object.Object
+	stack       []object.Object
+	sp          int
+	globals     []object.Object
+	frames      []*Frame
+	framesIndex int
 }
 
 var True = &object.Boolean{Value: true}
@@ -51,13 +50,21 @@ func (vm *VM) StackTop() object.Object {
 }
 
 func (vm *VM) Run() error {
-	for ip := 0; ip < len(vm.instructions); ip++ {
-		op := code.Opcode(vm.instructions[ip])
+	var ip int
+	var ins code.Instructions
+	var op code.Opcode
+
+	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
+		vm.currentFrame().ip++
+
+		ip = vm.currentFrame().ip
+		ins = vm.currentFrame().Instructions()
+		op = code.Opcode(ins[ip])
 
 		switch op {
 		case code.OpConstant:
-			constIndex := code.ReadUnit16(vm.instructions[ip+1:])
-			ip += 2
+			constIndex := code.ReadUnit16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 			err := vm.push(vm.constants[constIndex])
 
 			if err != nil {
